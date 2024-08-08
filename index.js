@@ -21,28 +21,35 @@ app.get("/allusers", async (req, res) => {
   res.render("user", { users: allusers });
 })
 
-app.post("/create", async function (req, res) {
-
+app.post("/allusers", async function (req, res, next) {
   const { title, detail, image } = req.body;
   const data = new userModel({
     title,
     detail,
     image
   })
+  console.log(data);
   await data.save();
-  res.send(data);
+  res.redirect('/allusers');
 
 })
 
-app.get("/editeUsers", async function (req, res) {
-  res.render("edit");
+app.get("/editeUsers/:id", async function (req, res) {
+ let user = await userModel.findOne({ _id: req.params.id });
+  res.render('edit',{user});
 })
+
+app.post("/updateUser/:id", async function (req, res) {
+  const { title, detail, image } = req.body;
+  let user = await userModel.findOneAndUpdate({ _id: req.params.id }, {title, detail, image}, {new: true});
+   res.redirect('/allusers');
+ })
 
 app.get("/deleteUsers/:id", async function (req, res) {
   let deleteuser = await userModel.findOneAndDelete({ _id: req.params.id });
   res.redirect("/allusers");
 })
 
-app.listen(3000, function () {
+app.listen(3000, function (val) {
   console.log("lestening the server");
 })
